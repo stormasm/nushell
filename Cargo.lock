@@ -3097,6 +3097,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "nu_plugin_len"
+version = "0.1.0"
+dependencies = [
+ "nu-plugin",
+ "nu-protocol",
+]
+
+[[package]]
 name = "nu_plugin_query"
 version = "0.84.1"
 dependencies = [

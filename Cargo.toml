@@ -41,6 +41,7 @@ members = [
 	"crates/nu_plugin_query",
 	"crates/nu_plugin_custom_values",
 	"crates/nu_plugin_formats",
+	"crates/nu_plugin_len",
 	"crates/nu-std",
 	"crates/nu-utils",
 ]
