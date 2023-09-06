@@ -2,11 +2,10 @@
 
 export-env {
     use dirs.nu []
-    use log.nu []
 }
 
 use dt.nu [datetime-diff, pretty-print-duration]
-use log.nu
+#use log.nu
 
 # Add the given paths to the PATH.
 #
