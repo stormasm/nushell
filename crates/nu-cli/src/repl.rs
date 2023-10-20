@@ -1,10 +1,8 @@
 use crate::util::eval_source;
-//use crossterm::cursor::SetCursorStyle;
 use log::{trace, warn};
 use miette::{ErrReport, IntoDiagnostic, Result};
 use nu_cmd_base::hook::eval_hook;
 use nu_cmd_base::util::get_guaranteed_cwd;
-//use nu_color_config::StyleComputer;
 use nu_engine::convert_env_values;
 use nu_parser::{lex, parse, trim_quotes_str};
 use nu_protocol::{
@@ -238,130 +236,8 @@ pub fn evaluate_repl(
             use_color,
         );
 
-        //start_time = std::time::Instant::now();
-
         let config = engine_state.get_config();
 
-        /*
-        let engine_reference = std::sync::Arc::new(engine_state.clone());
-
-        // Find the configured cursor shapes for each mode
-        let cursor_config = CursorConfig {
-            vi_insert: config
-                .cursor_shape_vi_insert
-                .map(map_nucursorshape_to_cursorshape),
-            vi_normal: config
-                .cursor_shape_vi_normal
-                .map(map_nucursorshape_to_cursorshape),
-            emacs: config
-                .cursor_shape_emacs
-                .map(map_nucursorshape_to_cursorshape),
-        };
-        perf(
-            "get config/cursor config",
-            start_time,
-            file!(),
-            line!(),
-            column!(),
-            use_color,
-        );
-
-        start_time = std::time::Instant::now();
-
-                line_editor = line_editor
-                    .with_highlighter(Box::new(NuHighlighter {
-                        engine_state: engine_reference.clone(),
-                        config: config.clone(),
-                    }))
-                    .with_validator(Box::new(NuValidator {
-                        engine_state: engine_reference.clone(),
-                    }))
-                    .with_completer(Box::new(NuCompleter::new(
-                        engine_reference.clone(),
-                        stack.clone(),
-                    )))
-                    .with_quick_completions(config.quick_completions)
-                    .with_partial_completions(config.partial_completions)
-                    .with_ansi_colors(config.use_ansi_coloring)
-                    .with_cursor_config(cursor_config)
-                    .with_transient_prompt(prompt_update::transient_prompt(
-                        engine_reference.clone(),
-                        stack,
-                    ));
-                perf(
-                    "reedline builder",
-                    start_time,
-                    file!(),
-                    line!(),
-                    column!(),
-                    use_color,
-                );
-        */
-        //let style_computer = StyleComputer::from_config(engine_state, stack);
-
-        /*
-        start_time = std::time::Instant::now();
-        line_editor = if config.use_ansi_coloring {
-            line_editor.with_hinter(Box::new({
-                // As of Nov 2022, "hints" color_config closures only get `null` passed in.
-                let style = style_computer.compute("hints", &Value::nothing(Span::unknown()));
-                DefaultHinter::default().with_style(style)
-            }))
-        } else {
-            line_editor.disable_hints()
-        };
-        perf(
-            "reedline coloring/style_computer",
-            start_time,
-            file!(),
-            line!(),
-            column!(),
-            use_color,
-        );
-        */
-
-        //line_editor.disable_hints();
-
-        /*
-        start_time = std::time::Instant::now();
-        line_editor = add_menus(line_editor, engine_reference, stack, config).unwrap_or_else(|e| {
-            let working_set = StateWorkingSet::new(engine_state);
-            report_error(&working_set, &e);
-            Reedline::create()
-        });
-        perf(
-            "reedline menus",
-            start_time,
-            file!(),
-            line!(),
-            column!(),
-            use_color,
-        );
-
-        start_time = std::time::Instant::now();
-        let buffer_editor = get_editor(engine_state, stack, Span::unknown());
-
-        line_editor = if let Ok((cmd, args)) = buffer_editor {
-            let mut command = std::process::Command::new(&cmd);
-            command.args(args).envs(
-                engine_state
-                    .render_env_vars()
-                    .into_iter()
-                    .filter_map(|(k, v)| v.as_string().ok().map(|v| (k, v))),
-            );
-            line_editor.with_buffer_editor(command, temp_file.clone())
-        } else {
-            line_editor
-        };
-        perf(
-            "reedline buffer_editor",
-            start_time,
-            file!(),
-            line!(),
-            column!(),
-            use_color,
-        );
-        */
         start_time = std::time::Instant::now();
         if config.sync_history_on_enter {
             if let Err(e) = line_editor.sync_history() {
@@ -377,59 +253,6 @@ pub fn evaluate_repl(
             use_color,
         );
 
-        /*
-        start_time = std::time::Instant::now();
-        // Changing the line editor based on the found keybindings
-        line_editor = match create_keybindings(config) {
-            Ok(keybindings) => match keybindings {
-                KeybindingsMode::Emacs(keybindings) => {
-                    let edit_mode = Box::new(Emacs::new(keybindings));
-                    line_editor.with_edit_mode(edit_mode)
-                }
-                KeybindingsMode::Vi {
-                    insert_keybindings,
-                    normal_keybindings,
-                } => {
-                    let edit_mode = Box::new(Vi::new(insert_keybindings, normal_keybindings));
-                    line_editor.with_edit_mode(edit_mode)
-                }
-            },
-            Err(e) => {
-                let working_set = StateWorkingSet::new(engine_state);
-                report_error(&working_set, &e);
-                line_editor
-            }
-        };
-        perf(
-            "keybindings",
-            start_time,
-            file!(),
-            line!(),
-            column!(),
-            use_color,
-        );
-
-        start_time = std::time::Instant::now();
-        // Right before we start our prompt and take input from the user,
-        // fire the "pre_prompt" hook
-        if let Some(hook) = config.hooks.pre_prompt.clone() {
-            if let Err(err) = eval_hook(engine_state, stack, None, vec![], &hook, "pre_prompt") {
-                report_error_new(engine_state, &err);
-            }
-        }
-        perf(
-            "pre-prompt hook",
-            start_time,
-            file!(),
-            line!(),
-            column!(),
-            use_color,
-        );
-
-        start_time = std::time::Instant::now();
-        */
-        // Next, check all the environment variables they ask for
-        // fire the "env_change" hook
         let config = engine_state.get_config();
         if let Err(error) =
             hook::eval_env_change_hook(config.hooks.env_change.clone(), engine_state, stack)
@@ -773,19 +596,6 @@ fn update_line_editor_history(
     Ok(line_editor)
 }
 
-/*
-fn map_nucursorshape_to_cursorshape(shape: NuCursorShape) -> SetCursorStyle {
-    match shape {
-        NuCursorShape::Block => SetCursorStyle::SteadyBlock,
-        NuCursorShape::UnderScore => SetCursorStyle::SteadyUnderScore,
-        NuCursorShape::Line => SetCursorStyle::SteadyBar,
-        NuCursorShape::BlinkBlock => SetCursorStyle::BlinkingBlock,
-        NuCursorShape::BlinkUnderScore => SetCursorStyle::BlinkingUnderScore,
-        NuCursorShape::BlinkLine => SetCursorStyle::BlinkingBar,
-    }
-}
-*/
-
 pub fn get_command_finished_marker(stack: &Stack, engine_state: &EngineState) -> String {
     let exit_code = stack
         .get_env_var(engine_state, "LAST_EXIT_CODE")
@@ -815,13 +625,6 @@ fn run_ansi_sequence(seq: &str) -> Result<(), ShellError> {
     })
 }
 
-// Absolute paths with a drive letter, like 'C:', 'D:\', 'E:\foo'
-#[cfg(windows)]
-static DRIVE_PATH_REGEX: once_cell::sync::Lazy<fancy_regex::Regex> =
-    once_cell::sync::Lazy::new(|| {
-        fancy_regex::Regex::new(r"^[a-zA-Z]:[/\\]?").expect("Internal error: regex creation")
-    });
-
 // A best-effort "does this string look kinda like a path?" function to determine whether to auto-cd
 fn looks_like_path(orig: &str) -> bool {
     #[cfg(windows)]
@@ -836,43 +639,4 @@ fn looks_like_path(orig: &str) -> bool {
         || orig.starts_with('/')
         || orig.starts_with('\\')
         || orig.ends_with(std::path::MAIN_SEPARATOR)
-}
-
-#[cfg(windows)]
-#[test]
-fn looks_like_path_windows_drive_path_works() {
-    assert!(looks_like_path("C:"));
-    assert!(looks_like_path("D:\\"));
-    assert!(looks_like_path("E:/"));
-    assert!(looks_like_path("F:\\some_dir"));
-    assert!(looks_like_path("G:/some_dir"));
-}
-
-#[cfg(windows)]
-#[test]
-fn trailing_slash_looks_like_path() {
-    assert!(looks_like_path("foo\\"))
-}
-
-#[cfg(not(windows))]
-#[test]
-fn trailing_slash_looks_like_path() {
-    assert!(looks_like_path("foo/"))
-}
-
-#[test]
-fn are_session_ids_in_sync() {
-    let engine_state = &mut EngineState::new();
-    let history_path_o =
-        crate::config_files::get_history_path("nushell", engine_state.config.history_file_format);
-    assert!(history_path_o.is_some());
-    let history_path = history_path_o.as_deref().unwrap();
-    let line_editor = reedline::Reedline::create();
-    let history_session_id = reedline::Reedline::create_history_session_id();
-    let line_editor =
-        update_line_editor_history(engine_state, history_path, line_editor, history_session_id);
-    assert_eq!(
-        i64::from(line_editor.unwrap().get_history_session_id().unwrap()),
-        engine_state.history_session_id
-    );
 }
