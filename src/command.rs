@@ -109,6 +109,7 @@ pub(crate) fn parse_commandline_args(
 
             // ide flags
             let include_path: Option<Expression> = call.get_flag_expr("include-path");
+            /*
             let ide_goto_def: Option<Value> =
                 call.get_flag(engine_state, &mut stack, "ide-goto-def")?;
             let ide_hover: Option<Value> = call.get_flag(engine_state, &mut stack, "ide-hover")?;
@@ -116,6 +117,7 @@ pub(crate) fn parse_commandline_args(
                 call.get_flag(engine_state, &mut stack, "ide-complete")?;
             let ide_check: Option<Value> = call.get_flag(engine_state, &mut stack, "ide-check")?;
             let ide_ast: Option<Spanned<String>> = call.get_named_arg("ide-ast");
+            */
 
             fn extract_contents(
                 expression: Option<Expression>,
@@ -190,11 +192,13 @@ pub(crate) fn parse_commandline_args(
                 log_target,
                 execute,
                 include_path,
+                /*
                 ide_goto_def,
                 ide_hover,
                 ide_complete,
                 ide_check,
                 ide_ast,
+                */
                 table_mode,
             });
         }
@@ -229,11 +233,13 @@ pub(crate) struct NushellCliArgs {
     pub(crate) execute: Option<Spanned<String>>,
     pub(crate) table_mode: Option<Value>,
     pub(crate) include_path: Option<Spanned<String>>,
-    pub(crate) ide_goto_def: Option<Value>,
-    pub(crate) ide_hover: Option<Value>,
-    pub(crate) ide_complete: Option<Value>,
-    pub(crate) ide_check: Option<Value>,
-    pub(crate) ide_ast: Option<Spanned<String>>,
+    /*
+        pub(crate) ide_goto_def: Option<Value>,
+        pub(crate) ide_hover: Option<Value>,
+        pub(crate) ide_complete: Option<Value>,
+        pub(crate) ide_check: Option<Value>,
+        pub(crate) ide_ast: Option<Spanned<String>>,
+    */
 }
 
 #[derive(Clone)]

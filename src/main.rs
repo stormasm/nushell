@@ -1,6 +1,6 @@
 mod command;
 mod config_files;
-mod ide;
+//mod ide;
 mod logger;
 mod run;
 mod signals;
@@ -191,6 +191,7 @@ fn main() -> Result<()> {
         load_standard_library(&mut engine_state)?;
     }
 
+    /*
     // IDE commands
     if let Some(ide_goto_def) = parsed_nu_cli_args.ide_goto_def {
         ide::goto_def(&mut engine_state, &script_name, &ide_goto_def);
@@ -216,7 +217,7 @@ fn main() -> Result<()> {
 
         return Ok(());
     }
-
+    */
     start_time = std::time::Instant::now();
     if let Some(testbin) = &parsed_nu_cli_args.testbin {
         // Call out to the correct testbin
