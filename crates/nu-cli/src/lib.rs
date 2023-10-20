@@ -1,25 +1,17 @@
-//mod commands;
-//mod completions;
 mod config_files;
 mod eval_cmds;
 mod eval_file;
-//mod menus;
 mod nu_highlight;
 mod print;
 mod prompt;
-//mod prompt_update;
-//mod reedline_config;
 mod repl;
 mod syntax_highlight;
 mod util;
 mod validation;
 
-//pub use commands::add_cli_context;
-//pub use completions::{FileCompletion, NuCompleter};
 pub use config_files::eval_config_contents;
 pub use eval_cmds::evaluate_commands;
 pub use eval_file::evaluate_file;
-//pub use menus::{DescriptionMenu, NuHelpCompleter};
 pub use nu_cmd_base::util::get_init_cwd;
 pub use nu_highlight::NuHighlight;
 pub use print::Print;
