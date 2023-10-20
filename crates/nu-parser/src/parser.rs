@@ -5980,6 +5980,8 @@ pub fn parse(
         }
     };
 
+    println!("{:?}", output);
+
     let mut seen = vec![];
     let mut seen_blocks = HashMap::new();
 

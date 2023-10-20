@@ -265,38 +265,39 @@ pub fn evaluate_repl(
         );
 
         start_time = std::time::Instant::now();
-
-        line_editor = line_editor
-            .with_highlighter(Box::new(NuHighlighter {
-                engine_state: engine_reference.clone(),
-                config: config.clone(),
-            }))
-            .with_validator(Box::new(NuValidator {
-                engine_state: engine_reference.clone(),
-            }))
-            .with_completer(Box::new(NuCompleter::new(
-                engine_reference.clone(),
-                stack.clone(),
-            )))
-            .with_quick_completions(config.quick_completions)
-            .with_partial_completions(config.partial_completions)
-            .with_ansi_colors(config.use_ansi_coloring)
-            .with_cursor_config(cursor_config)
-            .with_transient_prompt(prompt_update::transient_prompt(
-                engine_reference.clone(),
-                stack,
-            ));
-        perf(
-            "reedline builder",
-            start_time,
-            file!(),
-            line!(),
-            column!(),
-            use_color,
-        );
-
+        /*
+                line_editor = line_editor
+                    .with_highlighter(Box::new(NuHighlighter {
+                        engine_state: engine_reference.clone(),
+                        config: config.clone(),
+                    }))
+                    .with_validator(Box::new(NuValidator {
+                        engine_state: engine_reference.clone(),
+                    }))
+                    .with_completer(Box::new(NuCompleter::new(
+                        engine_reference.clone(),
+                        stack.clone(),
+                    )))
+                    .with_quick_completions(config.quick_completions)
+                    .with_partial_completions(config.partial_completions)
+                    .with_ansi_colors(config.use_ansi_coloring)
+                    .with_cursor_config(cursor_config)
+                    .with_transient_prompt(prompt_update::transient_prompt(
+                        engine_reference.clone(),
+                        stack,
+                    ));
+                perf(
+                    "reedline builder",
+                    start_time,
+                    file!(),
+                    line!(),
+                    column!(),
+                    use_color,
+                );
+        */
         let style_computer = StyleComputer::from_config(engine_state, stack);
 
+        /*
         start_time = std::time::Instant::now();
         line_editor = if config.use_ansi_coloring {
             line_editor.with_hinter(Box::new({
@@ -315,7 +316,11 @@ pub fn evaluate_repl(
             column!(),
             use_color,
         );
+        */
 
+        //line_editor.disable_hints();
+
+        /*
         start_time = std::time::Instant::now();
         line_editor = add_menus(line_editor, engine_reference, stack, config).unwrap_or_else(|e| {
             let working_set = StateWorkingSet::new(engine_state);
@@ -354,7 +359,7 @@ pub fn evaluate_repl(
             column!(),
             use_color,
         );
-
+        */
         start_time = std::time::Instant::now();
         if config.sync_history_on_enter {
             if let Err(e) = line_editor.sync_history() {
@@ -370,6 +375,7 @@ pub fn evaluate_repl(
             use_color,
         );
 
+        /*
         start_time = std::time::Instant::now();
         // Changing the line editor based on the found keybindings
         line_editor = match create_keybindings(config) {
@@ -419,6 +425,7 @@ pub fn evaluate_repl(
         );
 
         start_time = std::time::Instant::now();
+        */
         // Next, check all the environment variables they ask for
         // fire the "env_change" hook
         let config = engine_state.get_config();
