@@ -1,12 +1,4 @@
-use crate::{
-    //completions::NuCompleter,
-    prompt_update,
-    //reedline_config::{add_menus, create_keybindings, KeybindingsMode},
-    util::eval_source,
-    //NuHighlighter,
-    //NuValidator,
-    NushellPrompt,
-};
+use crate::util::eval_source;
 //use crossterm::cursor::SetCursorStyle;
 use log::{trace, warn};
 use miette::{ErrReport, IntoDiagnostic, Result};
@@ -30,7 +22,9 @@ use nu_protocol::{
     NU_VARIABLE_ID,
 };
 use nu_utils::utils::perf;
-use reedline::{EditCommand, FileBackedHistory, HistorySessionId, Reedline, SqliteBackedHistory};
+use reedline::{
+    DefaultPrompt, EditCommand, FileBackedHistory, HistorySessionId, Reedline, SqliteBackedHistory,
+};
 use std::{
     //env::temp_dir,
     io::{self, IsTerminal, Write},
@@ -74,7 +68,7 @@ pub fn evaluate_repl(
 
     let mut entry_num = 0;
 
-    let mut nu_prompt = NushellPrompt::new();
+    //let mut nu_prompt = NushellPrompt::new();
 
     let start_time = std::time::Instant::now();
     // Translate environment variables from Strings to Values
@@ -453,7 +447,9 @@ pub fn evaluate_repl(
 
         start_time = std::time::Instant::now();
         let config = &engine_state.get_config().clone();
-        let prompt = prompt_update::update_prompt(config, engine_state, stack, &mut nu_prompt);
+
+        //let prompt = prompt_update::update_prompt(config, engine_state, stack, &mut nu_prompt);
+
         perf(
             "update_prompt",
             start_time,
@@ -466,7 +462,9 @@ pub fn evaluate_repl(
         entry_num += 1;
 
         start_time = std::time::Instant::now();
-        let input = line_editor.read_line(prompt);
+
+        let prompt = DefaultPrompt::default();
+        let input = line_editor.read_line(&prompt);
         let shell_integration = config.shell_integration;
 
         match input {
