@@ -1,4 +1,4 @@
-mod commands;
+//mod commands;
 mod completions;
 mod config_files;
 mod eval_cmds;
@@ -14,7 +14,7 @@ mod syntax_highlight;
 mod util;
 mod validation;
 
-pub use commands::add_cli_context;
+//pub use commands::add_cli_context;
 pub use completions::{FileCompletion, NuCompleter};
 pub use config_files::eval_config_contents;
 pub use eval_cmds::evaluate_commands;
