@@ -1,32 +1,38 @@
 use crate::{
-    completions::NuCompleter,
+    //completions::NuCompleter,
     prompt_update,
-    reedline_config::{add_menus, create_keybindings, KeybindingsMode},
+    //reedline_config::{add_menus, create_keybindings, KeybindingsMode},
     util::eval_source,
-    NuHighlighter, NuValidator, NushellPrompt,
+    //NuHighlighter,
+    //NuValidator,
+    NushellPrompt,
 };
-use crossterm::cursor::SetCursorStyle;
+//use crossterm::cursor::SetCursorStyle;
 use log::{trace, warn};
 use miette::{ErrReport, IntoDiagnostic, Result};
+use nu_cmd_base::hook::eval_hook;
 use nu_cmd_base::util::get_guaranteed_cwd;
-use nu_cmd_base::{hook::eval_hook, util::get_editor};
-use nu_color_config::StyleComputer;
+//use nu_color_config::StyleComputer;
 use nu_engine::convert_env_values;
 use nu_parser::{lex, parse, trim_quotes_str};
 use nu_protocol::{
-    config::NuCursorShape,
+    //config::NuCursorShape,
     engine::{EngineState, Stack, StateWorkingSet},
     eval_const::create_nu_constant,
-    report_error, report_error_new, HistoryFileFormat, PipelineData, ShellError, Span, Spanned,
-    Value, NU_VARIABLE_ID,
+    report_error,
+    report_error_new,
+    HistoryFileFormat,
+    PipelineData,
+    ShellError,
+    Span,
+    Spanned,
+    Value,
+    NU_VARIABLE_ID,
 };
 use nu_utils::utils::perf;
-use reedline::{
-    CursorConfig, DefaultHinter, EditCommand, Emacs, FileBackedHistory, HistorySessionId, Reedline,
-    SqliteBackedHistory, Vi,
-};
+use reedline::{EditCommand, FileBackedHistory, HistorySessionId, Reedline, SqliteBackedHistory};
 use std::{
-    env::temp_dir,
+    //env::temp_dir,
     io::{self, IsTerminal, Write},
     path::Path,
     sync::atomic::Ordering,
@@ -95,7 +101,7 @@ pub fn evaluate_repl(
 
     let mut start_time = std::time::Instant::now();
     let mut line_editor = Reedline::create();
-    let temp_file = temp_dir().join(format!("{}.nu", uuid::Uuid::new_v4()));
+    //let temp_file = temp_dir().join(format!("{}.nu", uuid::Uuid::new_v4()));
 
     // Now that reedline is created, get the history session id and store it in engine_state
     store_history_id_in_engine(engine_state, &line_editor);
@@ -238,9 +244,11 @@ pub fn evaluate_repl(
             use_color,
         );
 
-        start_time = std::time::Instant::now();
+        //start_time = std::time::Instant::now();
+
         let config = engine_state.get_config();
 
+        /*
         let engine_reference = std::sync::Arc::new(engine_state.clone());
 
         // Find the configured cursor shapes for each mode
@@ -265,7 +273,7 @@ pub fn evaluate_repl(
         );
 
         start_time = std::time::Instant::now();
-        /*
+
                 line_editor = line_editor
                     .with_highlighter(Box::new(NuHighlighter {
                         engine_state: engine_reference.clone(),
@@ -295,7 +303,7 @@ pub fn evaluate_repl(
                     use_color,
                 );
         */
-        let style_computer = StyleComputer::from_config(engine_state, stack);
+        //let style_computer = StyleComputer::from_config(engine_state, stack);
 
         /*
         start_time = std::time::Instant::now();
@@ -767,6 +775,7 @@ fn update_line_editor_history(
     Ok(line_editor)
 }
 
+/*
 fn map_nucursorshape_to_cursorshape(shape: NuCursorShape) -> SetCursorStyle {
     match shape {
         NuCursorShape::Block => SetCursorStyle::SteadyBlock,
@@ -777,6 +786,7 @@ fn map_nucursorshape_to_cursorshape(shape: NuCursorShape) -> SetCursorStyle {
         NuCursorShape::BlinkLine => SetCursorStyle::BlinkingBar,
     }
 }
+*/
 
 pub fn get_command_finished_marker(stack: &Stack, engine_state: &EngineState) -> String {
     let exit_code = stack
