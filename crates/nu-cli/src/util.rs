@@ -1,4 +1,4 @@
-use nu_cmd_base::hook::eval_hook;
+//use nu_cmd_base::hook::eval_hook;
 use nu_engine::{eval_block, eval_block_with_early_return};
 use nu_parser::{escape_quote_string, lex, parse, unescape_unquote_string, Token, TokenContents};
 use nu_protocol::engine::StateWorkingSet;
@@ -243,7 +243,7 @@ pub fn eval_source(
 
     match b {
         Ok(pipeline_data) => {
-            let config = engine_state.get_config();
+            //let config = engine_state.get_config();
             let result;
             if let PipelineData::ExternalStream {
                 stdout: stream,
@@ -253,23 +253,26 @@ pub fn eval_source(
             } = pipeline_data
             {
                 result = print_if_stream(stream, stderr_stream, false, exit_code);
-            } else if let Some(hook) = config.hooks.display_output.clone() {
-                match eval_hook(
-                    engine_state,
-                    stack,
-                    Some(pipeline_data),
-                    vec![],
-                    &hook,
-                    "display_output",
-                ) {
-                    Err(err) => {
-                        result = Err(err);
-                    }
-                    Ok(val) => {
-                        result = val.print(engine_state, stack, false, false);
-                    }
-                }
-            } else {
+            }
+            /*
+                        } else if let Some(hook) = config.hooks.display_output.clone() {
+                            match eval_hook(
+                                engine_state,
+                                stack,
+                                Some(pipeline_data),
+                                vec![],
+                                &hook,
+                                "display_output",
+                            ) {
+                                Err(err) => {
+                                    result = Err(err);
+                                }
+                                Ok(val) => {
+                                    result = val.print(engine_state, stack, false, false);
+                                }
+                            }
+            */
+            else {
                 result = pipeline_data.print(engine_state, stack, true, false);
             }
 

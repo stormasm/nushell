@@ -1,7 +1,7 @@
 use crate::util::eval_source;
 use log::{trace, warn};
 use miette::{ErrReport, IntoDiagnostic, Result};
-use nu_cmd_base::hook::eval_hook;
+//use nu_cmd_base::hook::eval_hook;
 use nu_cmd_base::util::get_guaranteed_cwd;
 use nu_engine::convert_env_values;
 use nu_parser::{lex, parse, trim_quotes_str};
@@ -310,6 +310,7 @@ pub fn evaluate_repl(
 
                 // Right before we start running the code the user gave us, fire the `pre_execution`
                 // hook
+                /*
                 if let Some(hook) = config.hooks.pre_execution.clone() {
                     // Set the REPL buffer to the current command for the "pre_execution" hook
                     let mut repl = engine_state.repl_state.lock().expect("repl state mutex");
@@ -322,6 +323,7 @@ pub fn evaluate_repl(
                         report_error_new(engine_state, &err);
                     }
                 }
+                */
 
                 let mut repl = engine_state.repl_state.lock().expect("repl state mutex");
                 repl.cursor_pos = line_editor.current_insertion_point();
