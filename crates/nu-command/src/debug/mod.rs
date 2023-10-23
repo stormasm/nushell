@@ -1,4 +1,5 @@
 mod ast;
+mod ast_filter;
 mod debug_;
 mod explain;
 mod info;
@@ -12,6 +13,7 @@ mod view_source;
 mod view_span;
 
 pub use ast::Ast;
+pub use ast_filter::AstFilter;
 pub use debug_::Debug;
 pub use explain::Explain;
 pub use info::DebugInfo;

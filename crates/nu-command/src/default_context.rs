@@ -133,6 +133,7 @@ pub fn add_shell_command_context(mut engine_state: EngineState) -> EngineState {
         // Debug
         bind_command! {
             Ast,
+            AstFilter,
             Debug,
             DebugInfo,
             Explain,
