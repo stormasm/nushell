@@ -2,24 +2,24 @@ use serde::{Deserialize, Serialize};
 
 use super::Expr;
 use crate::ast::ImportPattern;
-use crate::DeclId;
-use crate::{engine::StateWorkingSet, BlockId, Signature, Span, Type, VarId, IN_VARIABLE_ID};
+//use crate::DeclId;
+use crate::{engine::StateWorkingSet, BlockId, Signature, Type, VarId, IN_VARIABLE_ID};
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ExpressionNoSpan {
     pub expr: Expr,
-    pub span: Span,
+    //pub span: Span,
     pub ty: Type,
-    pub custom_completion: Option<DeclId>,
+    //pub custom_completion: Option<DeclId>,
 }
 
 impl ExpressionNoSpan {
-    pub fn garbage(span: Span) -> ExpressionNoSpan {
+    pub fn garbage() -> ExpressionNoSpan {
         ExpressionNoSpan {
             expr: Expr::Garbage,
-            span,
+            //span,
             ty: Type::Any,
-            custom_completion: None,
+            //custom_completion: None,
         }
     }
 
@@ -485,6 +485,7 @@ impl ExpressionNoSpan {
         }
     }
 
+    /*
     pub fn replace_span(
         &mut self,
         working_set: &mut StateWorkingSet,
@@ -622,4 +623,5 @@ impl ExpressionNoSpan {
             Expr::VarDecl(_) => {}
         }
     }
+    */
 }
