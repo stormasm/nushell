@@ -14,8 +14,8 @@ pub struct ExpressionNoSpan {
 }
 
 impl ExpressionNoSpan {
-    pub fn garbage(span: Span) -> Expression {
-        Expression {
+    pub fn garbage(span: Span) -> ExpressionNoSpan {
+        ExpressionNoSpan {
             expr: Expr::Garbage,
             span,
             ty: Type::Any,
@@ -85,19 +85,21 @@ impl ExpressionNoSpan {
         }
     }
 
-    pub fn as_list(&self) -> Option<Vec<Expression>> {
+    /*
+    pub fn as_list(&self) -> Option<Vec<ExpressionNoSpan>> {
         match &self.expr {
             Expr::List(list) => Some(list.clone()),
             _ => None,
         }
     }
 
-    pub fn as_keyword(&self) -> Option<&Expression> {
+    pub fn as_keyword(&self) -> Option<&ExpressionNoSpan> {
         match &self.expr {
             Expr::Keyword(_, _, expr) => Some(expr),
             _ => None,
         }
     }
+    */
 
     pub fn as_var(&self) -> Option<VarId> {
         match self.expr {
