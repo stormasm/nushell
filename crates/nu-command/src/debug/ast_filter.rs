@@ -1,7 +1,7 @@
 use nu_engine::CallExt;
 use nu_parser::parse;
 use nu_protocol::{
-    ast::Call,
+    ast::{Block, Call},
     engine::{Command, EngineState, Stack, StateWorkingSet},
     record, Category, Example, IntoPipelineData, PipelineData, ShellError, Signature, Span,
     Spanned, SyntaxShape, Type, Value,
@@ -44,12 +44,15 @@ impl Command for AstFilter {
         let to_json = call.has_flag("json");
         let minify = call.has_flag("minify");
         let mut working_set = StateWorkingSet::new(engine_state);
-        let block_output = parse(&mut working_set, None, pipeline.item.as_bytes(), false);
+        let block_output_original = parse(&mut working_set, None, pipeline.item.as_bytes(), false);
         let error_output = working_set.parse_errors.first();
-        let block_span = match &block_output.span {
+        let block_span = match &block_output_original.span {
             Some(span) => span,
             None => &pipeline.span,
         };
+
+        let block_output = process_block(block_output_original.clone());
+
         if to_json {
             // Get the block as json
             let serde_block_str = if minify {
@@ -154,6 +157,10 @@ impl Command for AstFilter {
             },
         ]
     }
+}
+
+fn process_block(block: Block) -> Block {
+    block
 }
 
 #[cfg(test)]
