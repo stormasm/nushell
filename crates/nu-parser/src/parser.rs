@@ -29,7 +29,6 @@ use crate::parse_keywords::{
 };
 
 use itertools::Itertools;
-use log::trace;
 use std::collections::{HashMap, HashSet};
 use std::{num::ParseIntError, str};
 
@@ -298,8 +297,6 @@ pub fn parse_external_call(
     spans: &[Span],
     is_subexpression: bool,
 ) -> Expression {
-    trace!("parse external");
-
     let mut args = vec![];
 
     let head_contents = working_set.get_span_contents(spans[0]);
@@ -599,20 +596,15 @@ pub fn parse_multispan_value(
 ) -> Expression {
     match shape {
         SyntaxShape::VarWithOptType => {
-            trace!("parsing: var with opt type");
-
             parse_var_with_opt_type(working_set, spans, spans_idx, false).0
         }
         SyntaxShape::RowCondition => {
-            trace!("parsing: row condition");
             let arg = parse_row_condition(working_set, &spans[*spans_idx..]);
             *spans_idx = spans.len() - 1;
 
             arg
         }
         SyntaxShape::MathExpression => {
-            trace!("parsing: math expression");
-
             let arg = parse_math_expression(working_set, &spans[*spans_idx..], None);
             *spans_idx = spans.len() - 1;
 
@@ -667,8 +659,6 @@ pub fn parse_multispan_value(
             Expression::garbage(span)
         }
         SyntaxShape::Expression => {
-            trace!("parsing: expression");
-
             // is it subexpression?
             // Not sure, but let's make it not, so the behavior is the same as previous version of nushell.
             let arg = parse_expression(working_set, &spans[*spans_idx..], false);
@@ -677,19 +667,12 @@ pub fn parse_multispan_value(
             arg
         }
         SyntaxShape::Signature => {
-            trace!("parsing: signature");
-
             let sig = parse_full_signature(working_set, &spans[*spans_idx..]);
             *spans_idx = spans.len() - 1;
 
             sig
         }
         SyntaxShape::Keyword(keyword, arg) => {
-            trace!(
-                "parsing: keyword({}) {:?}",
-                String::from_utf8_lossy(keyword),
-                arg
-            );
             let arg_span = spans[*spans_idx];
 
             let arg_contents = working_set.get_span_contents(arg_span);
@@ -773,8 +756,6 @@ pub fn parse_internal_call(
     spans: &[Span],
     decl_id: usize,
 ) -> ParsedInternalCall {
-    trace!("parsing: internal call (decl id: {})", decl_id);
-
     let mut call = Call::new(command_span);
     call.decl_id = decl_id;
     call.head = command_span;
@@ -1021,8 +1002,6 @@ pub fn parse_call(
     head: Span,
     is_subexpression: bool,
 ) -> Expression {
-    trace!("parsing: call");
-
     if spans.is_empty() {
         working_set.error(ParseError::UnknownState(
             "Encountered command with zero spans".into(),
@@ -1084,8 +1063,6 @@ pub fn parse_call(
             let test_equal = working_set.get_span_contents(spans[1]);
 
             if test_equal == [b'='] {
-                trace!("incomplete statement");
-
                 working_set.error(ParseError::UnknownState(
                     "Incomplete statement".into(),
                     span(spans),
@@ -1105,8 +1082,6 @@ pub fn parse_call(
                 custom_completion,
             } = &alias.clone().wrapped_call
             {
-                trace!("parsing: alias of external call");
-
                 let mut final_args = args.clone();
 
                 for arg_span in spans.iter().skip(1) {
@@ -1124,7 +1099,6 @@ pub fn parse_call(
                     custom_completion: *custom_completion,
                 };
             } else {
-                trace!("parsing: alias of internal call");
                 parse_internal_call(
                     working_set,
                     span(&spans[cmd_start..pos]),
@@ -1133,7 +1107,6 @@ pub fn parse_call(
                 )
             }
         } else {
-            trace!("parsing: internal call");
             parse_internal_call(
                 working_set,
                 span(&spans[cmd_start..pos]),
@@ -1151,19 +1124,15 @@ pub fn parse_call(
     } else {
         // We might be parsing left-unbounded range ("..10")
         let bytes = working_set.get_span_contents(spans[0]);
-        trace!("parsing: range {:?} ", bytes);
         if let (Some(b'.'), Some(b'.')) = (bytes.first(), bytes.get(1)) {
-            trace!("-- found leading range indicator");
             let starting_error_count = working_set.parse_errors.len();
 
             let range_expr = parse_range(working_set, spans[0]);
             if working_set.parse_errors.len() == starting_error_count {
-                trace!("-- successfully parsed range");
                 return range_expr;
             }
             working_set.parse_errors.truncate(starting_error_count);
         }
-        trace!("parsing: external call");
 
         // Otherwise, try external command
         parse_external_call(working_set, spans, is_subexpression)
@@ -1171,7 +1140,6 @@ pub fn parse_call(
 }
 
 pub fn parse_binary(working_set: &mut StateWorkingSet, span: Span) -> Expression {
-    trace!("parsing: binary");
     let contents = working_set.get_span_contents(span);
     if contents.starts_with(b"0x[") {
         parse_binary_with_base(working_set, span, 16, 2, b"0x[", b"]")
@@ -1382,8 +1350,6 @@ pub fn parse_number(working_set: &mut StateWorkingSet, span: Span) -> Expression
 }
 
 pub fn parse_range(working_set: &mut StateWorkingSet, span: Span) -> Expression {
-    trace!("parsing: range");
-
     // Range follows the following syntax: [<from>][<next_operator><next>]<range_operator>[<to>]
     //   where <next_operator> is ".."
     //   and  <range_operator> is "..", "..=" or "..<"
@@ -1485,8 +1451,6 @@ pub fn parse_range(working_set: &mut StateWorkingSet, span: Span) -> Expression 
         )))
     };
 
-    trace!("-- from: {:?} to: {:?}", from, to);
-
     if let (None, None) = (&from, &to) {
         working_set.error(ParseError::Expected("at least one range bound set", span));
         return garbage(span);
@@ -1523,7 +1487,6 @@ pub fn parse_range(working_set: &mut StateWorkingSet, span: Span) -> Expression 
 }
 
 pub(crate) fn parse_dollar_expr(working_set: &mut StateWorkingSet, span: Span) -> Expression {
-    trace!("parsing: dollar expression");
     let contents = working_set.get_span_contents(span);
 
     if contents.starts_with(b"$\"") || contents.starts_with(b"$'") {
@@ -1971,7 +1934,6 @@ pub fn parse_full_cell_path(
     implicit_head: Option<VarId>,
     span: Span,
 ) -> Expression {
-    trace!("parsing: full cell path");
     let full_cell_span = span;
     let source = working_set.get_span_contents(span);
 
@@ -1984,8 +1946,6 @@ pub fn parse_full_cell_path(
     if let Some(head) = tokens.peek() {
         let bytes = working_set.get_span_contents(head.span);
         let (head, expect_dot) = if bytes.starts_with(b"(") {
-            trace!("parsing: paren-head of full cell path");
-
             let head_span = head.span;
             let mut start = head.span.start;
             let mut end = head.span.end;
@@ -2027,30 +1987,24 @@ pub fn parse_full_cell_path(
                 true,
             )
         } else if bytes.starts_with(b"[") {
-            trace!("parsing: table head of full cell path");
-
             let output = parse_table_expression(working_set, head.span);
 
             tokens.next();
 
             (output, true)
         } else if bytes.starts_with(b"{") {
-            trace!("parsing: record head of full cell path");
             let output = parse_record(working_set, head.span);
 
             tokens.next();
 
             (output, true)
         } else if bytes.starts_with(b"$") {
-            trace!("parsing: $variable head of full cell path");
-
             let out = parse_variable_expr(working_set, head.span);
 
             tokens.next();
 
             (out, true)
         } else if let Some(var_id) = implicit_head {
-            trace!("parsing: implicit head of full cell path");
             (
                 Expression {
                     expr: Expr::Var(var_id),
@@ -2092,11 +2046,8 @@ pub fn parse_full_cell_path(
 pub fn parse_directory(working_set: &mut StateWorkingSet, span: Span) -> Expression {
     let bytes = working_set.get_span_contents(span);
     let (token, err) = unescape_unquote_string(bytes, span);
-    trace!("parsing: directory");
 
     if err.is_none() {
-        trace!("-- found {}", token);
-
         Expression {
             expr: Expr::Directory(token),
             span,
@@ -2113,11 +2064,8 @@ pub fn parse_directory(working_set: &mut StateWorkingSet, span: Span) -> Express
 pub fn parse_filepath(working_set: &mut StateWorkingSet, span: Span) -> Expression {
     let bytes = working_set.get_span_contents(span);
     let (token, err) = unescape_unquote_string(bytes, span);
-    trace!("parsing: filepath");
 
     if err.is_none() {
-        trace!("-- found {}", token);
-
         Expression {
             expr: Expr::Filepath(token),
             span,
@@ -2132,8 +2080,6 @@ pub fn parse_filepath(working_set: &mut StateWorkingSet, span: Span) -> Expressi
 }
 /// Parse a datetime type, eg '2022-02-02'
 pub fn parse_datetime(working_set: &mut StateWorkingSet, span: Span) -> Expression {
-    trace!("parsing: datetime");
-
     let bytes = working_set.get_span_contents(span);
 
     if bytes.len() < 6
@@ -2187,8 +2133,6 @@ pub fn parse_datetime(working_set: &mut StateWorkingSet, span: Span) -> Expressi
 
 /// Parse a duration type, eg '10day'
 pub fn parse_duration(working_set: &mut StateWorkingSet, span: Span) -> Expression {
-    trace!("parsing: duration");
-
     let bytes = working_set.get_span_contents(span);
 
     match parse_unit_value(bytes, span, DURATION_UNIT_GROUPS, Type::Duration, |x| x) {
@@ -2206,8 +2150,6 @@ pub fn parse_duration(working_set: &mut StateWorkingSet, span: Span) -> Expressi
 
 /// Parse a unit type, eg '10kb'
 pub fn parse_filesize(working_set: &mut StateWorkingSet, span: Span) -> Expression {
-    trace!("parsing: filesize");
-
     let bytes = working_set.get_span_contents(span);
 
     // the hex digit `b` might be mistaken for the unit `b`, so check that first
@@ -2277,7 +2219,6 @@ pub fn parse_unit_value<'res>(
             None => (number_part as i64, *unit),
         };
 
-        trace!("-- found {} {:?}", num, unit);
         let expr = Expression {
             expr: Expr::ValueWithUnit(
                 Box::new(Expression {
@@ -2380,11 +2321,8 @@ fn modf(x: f64) -> (f64, f64) {
 pub fn parse_glob_pattern(working_set: &mut StateWorkingSet, span: Span) -> Expression {
     let bytes = working_set.get_span_contents(span);
     let (token, err) = unescape_unquote_string(bytes, span);
-    trace!("parsing: glob pattern");
 
     if err.is_none() {
-        trace!("-- found {}", token);
-
         Expression {
             expr: Expr::GlobPattern(token),
             span,
@@ -2594,8 +2532,6 @@ pub fn unescape_unquote_string(bytes: &[u8], span: Span) -> (String, Option<Pars
 }
 
 pub fn parse_string(working_set: &mut StateWorkingSet, span: Span) -> Expression {
-    trace!("parsing: string");
-
     let bytes = working_set.get_span_contents(span);
 
     if bytes.is_empty() {
@@ -2622,8 +2558,6 @@ pub fn parse_string(working_set: &mut StateWorkingSet, span: Span) -> Expression
 }
 
 pub fn parse_string_strict(working_set: &mut StateWorkingSet, span: Span) -> Expression {
-    trace!("parsing: string, with required delimiters");
-
     let bytes = working_set.get_span_contents(span);
 
     // Check for unbalanced quotes:
@@ -2656,8 +2590,6 @@ pub fn parse_string_strict(working_set: &mut StateWorkingSet, span: Span) -> Exp
     };
 
     if let Ok(token) = String::from_utf8(bytes.into()) {
-        trace!("-- found {}", token);
-
         if quoted {
             Expression {
                 expr: Expr::String(token),
@@ -2917,7 +2849,6 @@ pub fn expand_to_cell_path(
     expression: &mut Expression,
     var_id: VarId,
 ) {
-    trace!("parsing: expanding to cell path");
     if let Expression {
         expr: Expr::String(_),
         span,
@@ -3966,8 +3897,6 @@ fn table_type(head: &[Expression], rows: &[Vec<Expression>]) -> (Type, Vec<Parse
 }
 
 pub fn parse_block_expression(working_set: &mut StateWorkingSet, span: Span) -> Expression {
-    trace!("parsing: block expression");
-
     let bytes = working_set.get_span_contents(span);
 
     let mut start = span.start;
@@ -4245,8 +4174,6 @@ pub fn parse_closure_expression(
     shape: &SyntaxShape,
     span: Span,
 ) -> Expression {
-    trace!("parsing: closure expression");
-
     let bytes = working_set.get_span_contents(span);
 
     let mut start = span.start;
@@ -4388,8 +4315,6 @@ pub fn parse_value(
     span: Span,
     shape: &SyntaxShape,
 ) -> Expression {
-    trace!("parsing: value: {}", shape);
-
     let bytes = working_set.get_span_contents(span);
 
     if bytes.is_empty() {
@@ -4728,8 +4653,6 @@ pub fn parse_math_expression(
     spans: &[Span],
     lhs_row_var_id: Option<VarId>,
 ) -> Expression {
-    trace!("parsing: math expression");
-
     // As the expr_stack grows, we increase the required precedence to grow larger
     // If, at any time, the operator we're looking at is the same or lower precedence
     // of what is in the expression stack, we collapse the expression stack.
@@ -4901,8 +4824,6 @@ pub fn parse_expression(
     spans: &[Span],
     is_subexpression: bool,
 ) -> Expression {
-    trace!("parsing: expression");
-
     let mut pos = 0;
     let mut shorthand = vec![];
 
@@ -5094,11 +5015,9 @@ pub fn parse_builtin_commands(
     lite_command: &LiteCommand,
     is_subexpression: bool,
 ) -> Pipeline {
-    trace!("parsing: builtin commands");
     if !is_math_expression_like(working_set, lite_command.parts[0])
         && !is_unaliasable_parser_keyword(working_set, &lite_command.parts)
     {
-        trace!("parsing: not math expression or unaliasable parser keyword");
         let name = working_set.get_span_contents(lite_command.parts[0]);
         if let Some(decl_id) = working_set.find_decl(name) {
             let cmd = working_set.get_decl(decl_id);
@@ -5130,7 +5049,6 @@ pub fn parse_builtin_commands(
         }
     }
 
-    trace!("parsing: checking for keywords");
     let name = working_set.get_span_contents(lite_command.parts[0]);
 
     match name {
@@ -5357,7 +5275,6 @@ pub fn parse_pipeline(
             .iter()
             .map(|command| match command {
                 LiteElement::Command(span, command) => {
-                    trace!("parsing: pipeline element: command");
                     let expr = parse_expression(working_set, &command.parts, is_subexpression);
 
                     PipelineElement::Expression(*span, expr)
@@ -5371,7 +5288,6 @@ pub fn parse_pipeline(
                     out: (out_span, out_command),
                     err: (err_span, err_command),
                 } => {
-                    trace!("parsing: pipeline element: separate redirection");
                     let out_expr =
                         parse_value(working_set, out_command.parts[0], &SyntaxShape::Any);
 
@@ -5387,7 +5303,6 @@ pub fn parse_pipeline(
                     cmd: (cmd_span, command),
                     redirection: (redirect_span, redirect_command),
                 } => {
-                    trace!("parsing: pipeline element: same target redirection");
                     let expr = parse_expression(working_set, &command.parts, is_subexpression);
                     let redirect_expr =
                         parse_value(working_set, redirect_command.parts[0], &SyntaxShape::Any);
@@ -5479,7 +5394,6 @@ pub fn parse_pipeline(
                 cmd: (span, command),
                 redirection: (redirect_span, redirect_cmd),
             } => {
-                trace!("parsing: pipeline element: same target redirection");
                 let expr = parse_expression(working_set, &command.parts, is_subexpression);
 
                 let redirect_expr =
@@ -5507,8 +5421,6 @@ pub fn parse_block(
     if let Some(err) = err {
         working_set.error(err);
     }
-
-    trace!("parsing block: {:?}", lite_block);
 
     if scoped {
         working_set.enter_scope();

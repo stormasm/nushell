@@ -46,12 +46,6 @@ fn get_prompt_string(
                 // Use eval_subexpression to force a redirection of output, so we can use everything in prompt
                 let ret_val =
                     eval_subexpression(engine_state, &mut stack, block, PipelineData::empty());
-                trace!(
-                    "get_prompt_string (block) {}:{}:{}",
-                    file!(),
-                    line!(),
-                    column!()
-                );
 
                 ret_val
                     .map_err(|err| {
@@ -148,7 +142,7 @@ pub(crate) fn update_prompt<'prompt>(
     );
 
     let ret_val = nu_prompt as &dyn Prompt;
-    trace!("update_prompt {}:{}:{}", file!(), line!(), column!());
+    //trace!("update_prompt {}:{}:{}", file!(), line!(), column!());
 
     ret_val
 }
