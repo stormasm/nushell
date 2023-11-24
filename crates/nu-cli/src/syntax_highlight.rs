@@ -1,4 +1,4 @@
-use log::trace;
+//use log::trace;
 use nu_ansi_term::Style;
 use nu_color_config::{get_matching_brackets_style, get_shape_color};
 use nu_parser::{flatten_block, parse, FlatShape};
@@ -15,7 +15,7 @@ pub struct NuHighlighter {
 
 impl Highlighter for NuHighlighter {
     fn highlight(&self, line: &str, _cursor: usize) -> StyledText {
-        trace!("highlighting: {}", line);
+        //trace!("highlighting: {}", line);
 
         let mut working_set = StateWorkingSet::new(&self.engine_state);
         let block = parse(&mut working_set, None, line.as_bytes(), false);
