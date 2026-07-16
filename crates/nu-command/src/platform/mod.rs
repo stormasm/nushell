@@ -2,7 +2,6 @@ mod clear;
 #[cfg(not(target_arch = "wasm32"))]
 mod clip;
 mod dir_info;
-mod input;
 mod is_terminal;
 mod kill;
 mod sleep;
@@ -17,9 +16,6 @@ pub use clear::Clear;
 #[cfg(not(target_arch = "wasm32"))]
 pub use clip::{ClipCommand, ClipCopy, ClipPaste};
 pub use dir_info::{DirBuilder, DirInfo, ExcludeGlob, FileInfo};
-pub use input::Input;
-pub use input::InputList;
-pub use input::InputListen;
 pub use is_terminal::IsTerminal;
 pub use kill::Kill;
 pub use sleep::Sleep;
