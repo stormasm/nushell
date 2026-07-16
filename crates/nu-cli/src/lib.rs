@@ -7,6 +7,7 @@ mod config_files;
 mod eval_cmds;
 mod eval_file;
 mod hints;
+mod input;
 mod menus;
 mod prompt;
 mod prompt_update;
@@ -21,6 +22,9 @@ pub use completions::{FileCompletion, NuCompleter, SemanticSuggestion, Suggestio
 pub use config_files::eval_config_contents;
 pub use eval_cmds::{EvaluateCommandsOpts, evaluate_commands};
 pub use eval_file::evaluate_file;
+pub use input::Input;
+pub use input::InputList;
+pub use input::InputListen;
 pub use menus::NuHelpCompleter;
 pub use prompt::NushellPrompt;
 pub use prompt_update::update_prompt;
