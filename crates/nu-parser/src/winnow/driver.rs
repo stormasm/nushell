@@ -85,7 +85,7 @@ pub(super) enum BlockKind {
 /// `offset` in the working set's span space. Returns the block and, for a module body, the
 /// module; `None` when the winnow parser cannot take the block, with the working set left as it
 /// was.
-pub(super) fn parse_block(
+pub(super) fn parse_winnow_block(
     working_set: &mut StateWorkingSet,
     source: &str,
     offset: usize,

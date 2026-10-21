@@ -58,13 +58,15 @@ pub(crate) fn parse_file_block(
     span: Span,
     scoped: bool,
 ) -> Option<Block> {
+    let start_time = nu_utils::time::Instant::now();
     // `contents` is the caller's, not the working set's, so the syntax tree can borrow it while
     // the working set changes (unlike a module body's, which `parse_module_block` copies).
     let Ok(source) = std::str::from_utf8(contents) else {
         stats::record_classic_block();
         return None;
     };
-    driver::parse_block(
+    nu_utils::perf!("parse_file_block", start_time, true);
+    driver::parse_winnow_block(
         working_set,
         source,
         span.start,
@@ -91,7 +93,7 @@ pub(crate) fn parse_module_block(
         stats::record_classic_block();
         return None;
     };
-    let (block, module) = driver::parse_block(
+    let (block, module) = driver::parse_winnow_block(
         working_set,
         &source,
         span.start,

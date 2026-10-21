@@ -21,7 +21,7 @@ use crate::{
     parse_module::{double_main_span, parse_module_pipeline, set_module_main},
     parse_pipelines::{finish_block, hide_unlet_constants, parse_pipeline},
     winnow::{
-        driver::{BlockKind, parse_block, statement_changes_names},
+        driver::{BlockKind, parse_winnow_block, statement_changes_names},
         stats,
     },
 };
@@ -477,7 +477,7 @@ impl<'s> Lower<'_, '_, 's> {
                 is_subexpression,
                 input_type: input_type.cloned(),
             };
-            return parse_block(
+            return parse_winnow_block(
                 self.working_set,
                 self.source,
                 self.offset,
